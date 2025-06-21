@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobFinder - Your Dream Job Awaits</title>
+    <link rel="stylesheet" href="job.css">
+
+</head>
+<body>
+    <!-- header -->
+<header class="header">
+    <div class="container">
+        <nav class="nav">
+            <a href="#" class="logo"><b>💼 JobFinder</b></a>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#jobs">Jobs</a></li>
+                <li><a href="http://127.0.0.1:3000/login12.html">Login</a></li>
+                <li><a href="#about">About</a></li> 
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div class="container">
+    <!-- hero section -->
+    <section class="hero" id="home">
+        <h1>Find Your Dream Job</h1>
+        <p>Discover amazing opportunities from top companies worldwide</p>
+    </section>
+    <!-- search section -->
+    <section class="search-box">
+        <form class="search-form">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search jobs, companies, or keywords...">
+            <select class="search-select" id="locationSelect">
+                <option value="">All Locations</option>
+                <option value="remote">Remote</option>
+                <option value="hyderabad">Hyderabad</option>
+                <option value="bengaluru">Bengaluru</option>
+                <option value="rajahmundry">Rajahmundry</option>
+                <option value="mumbai">Mumbai</option>
+            </select>
+            <select class="search-select" id="typeSelect">
+                <option value="">All Types</option>
+                <option value="full-time">Full Time</option>
+                <option value="part-time">Part Time</option>
+                <option value="contract">Contract</option>
+            </select>
+            <button type="button" class="search-btn" onclick="searchJobs()">Search</button>
+        </form>
+    </section>
+
+    <!-- statistics -->
+    <section class="stats">
+        <div class="stat-item">
+            <span class="stat-number" id="totalJobs">1,254</span>
+            <span class="stat-label">Total Jobs</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" id="newJobs">89</span>
+            <span class="stat-label">New This Week</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" id="companies">142</span>
+            <span class="stat-label">Companies</span>
+        </div>
+    </section>
+
+    <!-- jobs section -->
+    <section class="jobs-section" id="jobs">
+        <h2 class="section-title">Latest Job Opportunities</h2>
+        <div class="jobs-grid" id="jobsContainer">
+        </div>
+        <div class="load-more">
+            <button class="load-more-btn" onclick="loadMoreJobs()">Load More Jobs</button>
+        </div>
+    </section>
+</div>
+
+<!-- footer -->
+<footer class="footer" id="about">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>For Job Seekers</h4>
+                <ul>
+                    <li><a href="#">Browse Jobs</a></li>
+                    <li><a href="#">Career Tips</a></li>
+                    <li><a href="#">Resume Help</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>For Employers</h4>
+                <ul>
+                    <li><a href="#">Post Jobs</a></li>
+                    <li><a href="#">Find Talent</a></li>
+                    <li><a href="#">Pricing</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <ul>
+                    <li><a href="#">Phone: 9290xxxxx</a></li>
+                    <li><a href="#">Email: 23pa1a4527@vishnu.edu.in</a></li>
+                    <li><a href="#">Instagram: Vamsi Krishna</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy</a></li>
+                </ul>
+            </div>
+        </div>
+        <p>&copy; 2024 JobFinder. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Job Detail Modal -->
+<div id="jobModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <div id="modalContent">
+        </div>
+    </div>
+</div>
+
+<script src="job.js"></script>
+</body>
+</html>
