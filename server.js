@@ -1,14 +1,24 @@
 const express = require("express");
 const path = require("path");
 const admin = require("firebase-admin");
-
-// Firebase Admin initialization (prevent multiple initializations)
 function initializeFirebase() {
   if (!admin.apps || !admin.apps.length) {
-    const serviceAccount = require(process.env.FIREBASE_SERVICE_ACCOUNT_PATH || "./firebase-service-account.json");
+    const serviceAccount = {
+      type: "service_account",
+      project_id: process.env.FIREBASE_PROJECT_ID,
+      private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+      private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      client_email: process.env.FIREBASE_CLIENT_EMAIL,
+      client_id: process.env.FIREBASE_CLIENT_ID,
+      auth_uri: "https://accounts.google.com/o/oauth2/auth",
+      token_uri: "https://oauth2.googleapis.com/token",
+      auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+      client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL
+    };
+
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
-      databaseURL: "https://job-finder-cbf74-default-rtdb.firebaseio.com"
+      databaseURL: process.env.FIREBASE_DATABASE_URL || "https://job-finder-cbf74-default-rtdb.firebaseio.com"
     });
   }
 }
@@ -20,6 +30,17 @@ const app = express();
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
 
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index12.html"));
@@ -37,6 +58,13 @@ app.post("/api/signup", async (req, res) => {
     try {
         const { name, email, password } = req.body;
         
+        // Validate input
+        if (!name || !email || !password) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "All fields are required" 
+            });
+        }
         
         const userRecord = await admin.auth().createUser({
             email: email,
@@ -44,7 +72,6 @@ app.post("/api/signup", async (req, res) => {
             displayName: name,
         });
 
-       
         await db.collection('users').doc(userRecord.uid).set({
             name: name,
             email: email,
@@ -52,7 +79,7 @@ app.post("/api/signup", async (req, res) => {
             uid: userRecord.uid
         });
 
-        res.json({ 
+        res.status(200).json({ 
             success: true, 
             message: "User created successfully",
             uid: userRecord.uid 
@@ -71,7 +98,13 @@ app.post("/api/login", async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        
+        // Validate input
+        if (!email || !password) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Email and password are required" 
+            });
+        }
         const userRecord = await admin.auth().getUserByEmail(email);
         
         await db.collection('loginLogs').add({
@@ -81,9 +114,9 @@ app.post("/api/login", async (req, res) => {
             success: true
         });
 
-        res.json({ 
+        res.status(200).json({ 
             success: true, 
-            message: "Login successful",
+            message: "User found - complete authentication on client side",
             uid: userRecord.uid 
         });
 
@@ -110,20 +143,17 @@ app.get("/api/users", async (req, res) => {
         snapshot.forEach(doc => {
             users.push({ id: doc.id, ...doc.data() });
         });
-        res.json(users);
+        res.status(200).json(users);
     } catch (error) {
+        console.error("Error fetching users:", error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// Export the app for Vercel serverless
 module.exports = app;
-
-// Only listen if running locally
 if (require.main === module) {
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
-
