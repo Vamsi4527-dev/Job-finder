@@ -1,29 +1,17 @@
 const express = require("express");
 const path = require("path");
 const admin = require("firebase-admin");
-
-function initializeFirebase() {
-  if (!admin.apps.length) {
-    const serviceAccount = {
-      type: "service_account",
-      project_id: process.env.FIREBASE_PROJECT_ID,
-      private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-      private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      client_email: process.env.FIREBASE_CLIENT_EMAIL,
-      client_id: process.env.FIREBASE_CLIENT_ID,
-      auth_uri: "https://accounts.google.com/o/oauth2/auth",
-      token_uri: "https://oauth2.googleapis.com/token",
-      auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-      client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL
-    };
-
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      databaseURL: process.env.FIREBASE_DATABASE_URL
-    });
-  }
+let serviceAccount;
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+} else {
+    serviceAccount = require("./job-finder-cbf74-firebase-adminsdk-fbsvc-b9e31fb930.json");
 }
-initializeFirebase();
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://job-finder-cbf74-default-rtdb.firebaseio.com"
+});
 
 const db = admin.firestore();
 
@@ -31,33 +19,34 @@ const app = express();
 app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index12.html"));
 });
 
 app.get("/login", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "login12.html"));
+    res.sendFile(path.join(__dirname,"public","login12.html"));
 });
 
 app.get("/signup", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "signup12.html"));
+    res.sendFile(path.join(__dirname,"public","signup12.html"));
 });
-
 
 app.post("/api/signup", async (req, res) => {
     try {
         const { name, email, password } = req.body;
-        
-        
+        if (!name || !email || !password) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Name, email, and password are required" 
+            });
+        }
+
         const userRecord = await admin.auth().createUser({
             email: email,
             password: password,
             displayName: name,
         });
 
-       
         await db.collection('users').doc(userRecord.uid).set({
             name: name,
             email: email,
@@ -84,9 +73,14 @@ app.post("/api/login", async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        
+        if (!email || !password) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Email and password are required" 
+            });
+        }
+
         const userRecord = await admin.auth().getUserByEmail(email);
-        
         await db.collection('loginLogs').add({
             email: email,
             uid: userRecord.uid,
@@ -97,13 +91,15 @@ app.post("/api/login", async (req, res) => {
         res.json({ 
             success: true, 
             message: "Login successful",
-            uid: userRecord.uid 
+            uid: userRecord.uid,
+            note: "Password verification should be done on client-side with Firebase Auth"
         });
 
     } catch (error) {
         console.error("Error during login:", error);
+        
         await db.collection('loginLogs').add({
-            email: req.body.email,
+            email: req.body.email || 'unknown',
             loginTime: admin.firestore.FieldValue.serverTimestamp(),
             success: false,
             error: error.message
@@ -116,20 +112,27 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
-
 app.get("/api/users", async (req, res) => {
     try {
         const snapshot = await db.collection('users').get();
         const users = [];
         snapshot.forEach(doc => {
-            users.push({ id: doc.id, ...doc.data() });
+            const userData = doc.data();
+            delete userData.password; 
+            users.push({ id: doc.id, ...userData });
         });
         res.json(users);
     } catch (error) {
+        console.error("Error fetching users:", error);
         res.status(500).json({ error: error.message });
     }
 });
-const PORT=3001;
+
+app.get("/api/health", (req, res) => {
+    res.json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
