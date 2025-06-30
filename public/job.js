@@ -224,7 +224,7 @@ function handleLogout() {
         isUserLoggedIn = false;
         updateLogoutVisibility();
         alert('You have been logged out successfully!');
-        window.location.href = 'login12.html';
+        window.location.href = 'login.html';
     }
 }
 
