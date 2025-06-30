@@ -1,28 +1,31 @@
 {
   "name": "job-finder-app",
   "version": "1.0.0",
-  "description": "Job finder application with Firebase authentication",
+  "description": "Job Finder app with Express and Firebase Admin integration",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
-  "dependencies": {
-    "express": "^4.21.2",
-    "firebase-admin": "^12.7.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
-  },
+  "keywords": [
+    "express",
+    "firebase",
+    "job-finder",
+    "backend"
+  ],
+  "author": "Your Name",
+  "license": "ISC",
   "engines": {
     "node": ">=18"
   },
-  "keywords": [
-    "job-finder",
-    "firebase",
-    "express",
-    "authentication"
-  ],
-  "author": "Your Name",
-  "license": "ISC"
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "firebase-admin": "^12.7.0",
+    "helmet": "^7.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
 }
