@@ -12,8 +12,8 @@
         
         <nav>
             <ul>
-                <li><a class="logout-btn" href="index12.html">Home</a></li>
-                <li><a class="logout-btn" href="login12.html">Login</a></li>
+                <li><a class="logout-btn" href="index.html">Home</a></li>
+                <li><a class="logout-btn" href="login.html">Login</a></li>
             </ul>
         </nav>
     </header>
@@ -62,7 +62,7 @@
                     messageDiv.innerHTML = `<div style="color: White;">${result.message}</div>`;
                     document.getElementById('signupForm').reset();
                     setTimeout(() => {
-                        window.location.href = 'login12.html';
+                        window.location.href = 'login.html';
                     }, 2000);
                 } else {
                     messageDiv.innerHTML = `<div style="color: red;">${result.message}</div>`;
