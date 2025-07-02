@@ -2,7 +2,6 @@ const express = require("express");
 const path = require("path");
 const admin = require("firebase-admin");
 
-// Simple fix: just use the JSON file instead
 const serviceAccount = require("./job-finder-cbf74-firebase-adminsdk-fbsvc-b9e31fb930.json");
 
 admin.initializeApp({
