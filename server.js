@@ -1,8 +1,22 @@
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 const admin = require("firebase-admin");
 
+// Debug: Check if file exists
+const jsonPath = path.join(__dirname, "job-finder-cbf74-firebase-adminsdk-fbsvc-b9e31fb930.json");
+console.log("JSON file path:", jsonPath);
+console.log("File exists:", fs.existsSync(jsonPath));
+
 const serviceAccount = require("./job-finder-cbf74-firebase-adminsdk-fbsvc-b9e31fb930.json");
+
+// Debug: Check what's actually loaded
+console.log("Service account loaded:", {
+  type: serviceAccount.type,
+  project_id: serviceAccount.project_id,
+  hasPrivateKey: !!serviceAccount.private_key,
+  client_email: serviceAccount.client_email
+});
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -67,14 +81,7 @@ app.post("/api/signup", async (req, res) => {
 app.post("/api/login", async (req, res) => {
     try {
         const { email, password } = req.body;
-        
-        // This is a simple check - in production you'd verify the actual password
         const userRecord = await admin.auth().getUserByEmail(email);
-        
-        if (!userRecord) {
-            throw new Error("Invalid email or password");
-        }
-        
         await db.collection('loginLogs').add({
             email: email,
             uid: userRecord.uid,
@@ -99,7 +106,7 @@ app.post("/api/login", async (req, res) => {
 
         res.status(400).json({ 
             success: false, 
-            message: "Invalid email or password"
+            message: "Login failed: " + error.message 
         });
     }
 });
