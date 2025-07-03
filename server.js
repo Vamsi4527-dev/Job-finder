@@ -1,22 +1,8 @@
 const express = require("express");
 const path = require("path");
-const fs = require("fs");
 const admin = require("firebase-admin");
 
-// Debug: Check if file exists
-const jsonPath = path.join(__dirname, "job-finder-cbf74-firebase-adminsdk-fbsvc-b9e31fb930.json");
-console.log("JSON file path:", jsonPath);
-console.log("File exists:", fs.existsSync(jsonPath));
-
 const serviceAccount = require("./job-finder-cbf74-firebase-adminsdk-fbsvc-b9e31fb930.json");
-
-// Debug: Check what's actually loaded
-console.log("Service account loaded:", {
-  type: serviceAccount.type,
-  project_id: serviceAccount.project_id,
-  hasPrivateKey: !!serviceAccount.private_key,
-  client_email: serviceAccount.client_email
-});
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
