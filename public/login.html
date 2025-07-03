@@ -12,8 +12,8 @@
         <h3>Login</h3>
         <nav>
             <ul>
-                <li><a class="logout-btn" href="index.html">Home</a></li>
-                <li><a class="logout-btn" href="signup.html">Sign Up</a></li>
+                <li><a class="logout-btn" href="public/index.html">Home</a></li>
+                <li><a class="logout-btn" href="public/signup.html">Sign Up</a></li>
             </ul>
         </nav>
     </header>
@@ -58,7 +58,7 @@
                     localStorage.setItem('loggedIn', 'true');
                     messageDiv.innerHTML = `<div style="color:White;">${result.message}</div>`;
                     setTimeout(() => {
-                        window.location.href = 'job-searching.html';
+                        window.location.href = 'public/job-searching.html';
                     }, 2000);
                 } else {
                     messageDiv.innerHTML = `<div style="color: red;">${result.message}</div>`;
